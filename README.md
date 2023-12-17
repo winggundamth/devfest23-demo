@@ -89,7 +89,7 @@ gcloud source repos create python-fastapi
 # Go to SET UP CONTINUOUS DEPLOYMENT in Cloud Run
 
 # Change Code to v3
-git remote add google ssh://[YOUR EMAIL]@source.developers.google.com:2022/p/[YOUR GCP PROJECT]/r/python-fastapi
+git remote add google ssh://[YOUR EMAIL]@source.developers.google.com:2022/p/{YOUR GCP PROJECT}/r/python-fastapi
 git push --all google
 ```
 
@@ -123,7 +123,7 @@ gcloud beta run domain-mappings --region asia-southeast1 create \
 
 # gcloud deploy releases create fastapi-release-$(date +"%Y%m%d%H%M") \
 #   --delivery-pipeline fastapi --skaffold-file skaffold.yaml --region asia-southeast1 \
-#   --images 'fastapi=asia-southeast1-docker.pkg.dev/[YOUR GCP PROJECT]/devfest/fastapi@sha256:87ded8770178d25b286ef74f332fb2574300ab83a97bf672940bbede3dae6de1'
+#   --images 'fastapi=asia-southeast1-docker.pkg.dev/{YOUR GCP PROJECT}/devfest/fastapi@sha256:87ded8770178d25b286ef74f332fb2574300ab83a97bf672940bbede3dae6de1'
 ```
 
 ## 11 Observability
@@ -139,4 +139,4 @@ k6 run k6-load-testing.js
 
 ## Security
 
-* [Docker Image Scan](https://console.cloud.google.com/artifacts/docker/[YOUR GCP PROJECT]/asia-southeast1/devfest/fastapi/)
+* [Docker Image Scan](https://console.cloud.google.com/artifacts/docker/{YOUR GCP PROJECT}/asia-southeast1/devfest/fastapi/)
