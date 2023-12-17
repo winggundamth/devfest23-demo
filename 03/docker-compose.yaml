@@ -1,0 +1,34 @@
+services:
+  app-a:
+    container_name: app-a
+    image: python-fastapi
+    build: .
+    user: "1000:1000"
+    ports:
+      - 8001:8000
+    networks:
+      - monitoring
+
+  app-b:
+    container_name: app-b
+    image: python-fastapi
+    build: .
+    user: "1000:1000"
+    ports:
+      - 8002:8000
+    networks:
+      - monitoring
+
+  app-c:
+    container_name: app-c
+    image: python-fastapi
+    build: .
+    user: "1000:1000"
+    ports:
+      - 8003:8000
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    driver: bridge

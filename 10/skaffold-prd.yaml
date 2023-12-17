@@ -1,0 +1,16 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: fastapi-prd  # from-param: ${service_name}
+spec:
+  template:
+    spec:
+      containers:
+        - image: fastapi
+          ports:
+            - containerPort: 8000
+          env:
+            - name: TARGET_ONE_HOST
+              value: "https://app-b.opsta.dev"
+            - name: TARGET_TWO_HOST
+              value: "https://app-c.opsta.dev"

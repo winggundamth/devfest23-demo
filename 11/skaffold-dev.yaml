@@ -1,0 +1,28 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: fastapi-dev  # from-param: ${service_name}
+spec:
+  template:
+    spec:
+      containers:
+        - image: fastapi
+          ports:
+            - containerPort: 8000
+          env:
+            - name: TARGET_ONE_HOST
+              value: "https://app-b.dev.opsta.dev"
+            - name: TARGET_TWO_HOST
+              value: "https://app-c.dev.opsta.dev"
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_SERVICE_NAME
+              value: fastapi-dev  # from-param: ${service_name}
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: 35.240.190.135:4317
+            - name: OTEL_EXPORTER_OTLP_INSECURE
+              value: true
+            - name: OTEL_PYTHON_LOG_CORRELATION
+              value: true
+            - name: APP_NAME
+              value: fastapi-dev  # from-param: ${service_name}

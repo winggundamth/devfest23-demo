@@ -1,0 +1,55 @@
+steps:
+  - id: Unit test
+    name: python:3.12.1-slim-bookworm
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      pip install -r 11/requirements.txt -r 11/requirements-dev.txt \
+      && pytest 11/
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+      - '11'
+      - '-f'
+      - 11/Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+    id: Push
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    args:
+    - '-c'
+    - |
+      gcloud deploy releases create fastapi-release-$(date +"%Y%m%d%H%M") \
+      --images=fastapi=$_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA \
+      --region=$_DEPLOY_REGION --delivery-pipeline=fastapi --skaffold-file=11/skaffold.yaml \
+      && gcloud run services add-iam-policy-binding app-a-dev \
+      --region asia-southeast1 --member="allUsers" --role="roles/run.invoker" \
+      && gcloud run services add-iam-policy-binding app-b-dev \
+      --region asia-southeast1 --member="allUsers" --role="roles/run.invoker" \
+      && gcloud run services add-iam-policy-binding app-c-dev \
+      --region asia-southeast1 --member="allUsers" --role="roles/run.invoker" \
+      && gcloud run services add-iam-policy-binding app-a-prd \
+      --region asia-southeast1 --member="allUsers" --role="roles/run.invoker" \
+      && gcloud run services add-iam-policy-binding app-b-prd \
+      --region asia-southeast1 --member="allUsers" --role="roles/run.invoker" \
+      && gcloud run services add-iam-policy-binding app-c-prd \
+      --region asia-southeast1 --member="allUsers" --role="roles/run.invoker"
+    id: Deploy
+    entrypoint: bash
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+images:
+  - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+substitutions:
+  _AR_HOSTNAME: asia-southeast1-docker.pkg.dev
+  _PLATFORM: managed
+  _IMAGE_NAME: fastapi
+  _DEPLOY_REGION: asia-southeast1

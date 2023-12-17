@@ -1,0 +1,17 @@
+apiVersion: skaffold/v3alpha1
+kind: Config
+metadata:
+  name: fastapi
+profiles:
+  - name: dev
+    manifests:
+      rawYaml:
+        - skaffold-dev.yaml
+  - name: prd
+    manifests:
+      rawYaml:
+        - skaffold-prd.yaml
+deploy:
+  cloudrun:
+    projectid: unused
+    region: unused

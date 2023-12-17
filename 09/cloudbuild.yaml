@@ -1,0 +1,45 @@
+steps:
+  - id: Unit test
+    name: python:3.12.1-slim-bookworm
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      pip install -r 09/requirements.txt -r 09/requirements-dev.txt \
+      && pytest 09/
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+      - '09'
+      - '-f'
+      - 09/Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+    id: Push
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    args:
+      - run
+      - services
+      - update
+      - app-a
+      - '--image=$_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA'
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+images:
+  - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+substitutions:
+  _AR_HOSTNAME: asia-southeast1-docker.pkg.dev
+  _PLATFORM: managed
+  _IMAGE_NAME: fastapi
+  _DEPLOY_REGION: asia-southeast1

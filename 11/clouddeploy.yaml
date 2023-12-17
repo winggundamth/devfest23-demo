@@ -1,0 +1,78 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: fastapi
+serialPipeline:
+  stages:
+    - targetId: fastapi-dev
+      profiles: [dev]
+    - targetId: fastapi-prd
+      profiles: [prd]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: fastapi-dev
+multiTarget:
+  targetIds: [ app-a-dev, app-b-dev, app-c-dev ]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: fastapi-prd
+multiTarget:
+  targetIds: [ app-a-prd, app-b-prd, app-c-prd ]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: app-a-dev
+deployParameters:
+  service_name: app-a-dev
+run:
+  location: projects/[YOUR GCP PROJECT]/locations/asia-southeast1
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: app-b-dev
+deployParameters:
+  service_name: app-b-dev
+run:
+  location: projects/[YOUR GCP PROJECT]/locations/asia-southeast1
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: app-c-dev
+deployParameters:
+  service_name: app-c-dev
+run:
+  location: projects/[YOUR GCP PROJECT]/locations/asia-southeast1
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: app-a-prd
+deployParameters:
+  service_name: app-a-prd
+run:
+  location: projects/[YOUR GCP PROJECT]/locations/asia-southeast1
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: app-b-prd
+deployParameters:
+  service_name: app-b-prd
+run:
+  location: projects/[YOUR GCP PROJECT]/locations/asia-southeast1
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: app-c-prd
+deployParameters:
+  service_name: app-c-prd
+run:
+  location: projects/[YOUR GCP PROJECT]/locations/asia-southeast1

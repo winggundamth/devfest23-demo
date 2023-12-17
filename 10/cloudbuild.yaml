@@ -1,0 +1,43 @@
+steps:
+  - id: Unit test
+    name: python:3.12.1-slim-bookworm
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      pip install -r 10/requirements.txt -r 10/requirements-dev.txt \
+      && pytest 10/
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+      - '10'
+      - '-f'
+      - 10/Dockerfile
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+    id: Push
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    args:
+    - '-c'
+    - |
+      gcloud deploy releases create fastapi-release-$(date +"%Y%m%d%H%M") \
+      --images=fastapi=$_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA \
+      --region=$_DEPLOY_REGION --delivery-pipeline=fastapi --skaffold-file=10/skaffold.yaml
+    id: Deploy
+    entrypoint: bash
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+images:
+  - $_AR_HOSTNAME/$PROJECT_ID/devfest/$_IMAGE_NAME:$COMMIT_SHA
+substitutions:
+  _AR_HOSTNAME: asia-southeast1-docker.pkg.dev
+  _PLATFORM: managed
+  _IMAGE_NAME: fastapi
+  _DEPLOY_REGION: asia-southeast1
